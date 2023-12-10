@@ -1,6 +1,6 @@
 #ifndef __MDPARTICLE_HPP__
 #define __MDPARTICLE_HPP__
-
+#define eigen_assert(X) do { if(!(X)) throw std::runtime_error(#X); } while(false);
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 
 #else

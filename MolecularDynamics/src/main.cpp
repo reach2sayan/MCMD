@@ -17,10 +17,10 @@ double pot(const typename MDParticle<D>::Vector& r){
 	return 4.0 * SIGMA_6 * (SIGMA_6 / (r4*r4*r4) - 1 / (r4*r2));
 }
 
-constexpr int DEFAULT_PARTICLES = 4;
+constexpr int DEFAULT_PARTICLES = 2;
 constexpr double DEFAULT_TIMESTEP = 0.001;
-constexpr double DEFAULT_NU = 1;
-constexpr double DEFAULT_TEMP_START = 0.5;
+constexpr double DEFAULT_NU = 10;
+constexpr double DEFAULT_TEMP_START = 0.1;
 constexpr int DIMENSION = 2;
 
 int main(int argc, char* argv[]){	// Args: n, dt, nue, temp_start [, glut-Optionen]

@@ -8,9 +8,9 @@ constexpr auto M = 397;
 constexpr auto HI = 0x80000000;
 constexpr auto LO = 0x7fffffff;
 constexpr auto MAX = 0xFFFFFFFF;
-std::mt19937_64 mersenneTwister{};
+//std::mt19937_64 mersenneTwister{};
 
-//double mersenneTwister();
+double mersenneTwister();
 
 template<int D>
 void AndersonThermostat<D>::execute(){
@@ -44,15 +44,15 @@ void AndersonThermostat<D>::execute(){
 }
 
 template<int D>
-inline AndersonThermostat<D>::AndersonThermostat(MDSimulation<D>* sim, double temp, double nu) :
-	Thermostat<D>{sim,temp}, nu{-1.0*nu} {
-		p = 1 - exp(nu*sim->getDt());
+inline AndersonThermostat<D>::AndersonThermostat(MDSimulation<D>* sim_, double temp_, double nu_) :
+	Thermostat<D>{sim_,temp_}, nu{-1.0*nu_} {
+		p = 1 - exp(-1*nu_*sim_->getDt());
 	}
 
 template<int D>
 inline void AndersonThermostat<D>::setNu(const double nu_){
 	nu = (-1.0)*nu_;
-	p = 1 - exp(nu_*this->sim->getDt());
+	p = 1 - exp(-1*nu_*(this->sim->getDt()));
 }
 
 template<int D>
@@ -61,8 +61,8 @@ inline double AndersonThermostat<D>::getNu() const {
 }
 
 template<int D>
-inline void AndersonThermostat<D>::setT(const double temp) { 
-	this->temp = -2.0*temp;
+inline void AndersonThermostat<D>::setT(const double temp_) { 
+	this->temp = -2.0*temp_;
 }
 
 template<int D>
@@ -70,7 +70,7 @@ inline double AndersonThermostat<D>::getT() const {
 	return -0.5*this->temp;
 }
 template class AndersonThermostat<2>;
-/*
+
 double mersenneTwister(){
 
 	static constexpr uint32_t seed = 5489UL;
@@ -112,4 +112,4 @@ double mersenneTwister(){
 	e ^= (e >> 18);
 
 	return static_cast<double>(e) / MAX;
-}*/
+}

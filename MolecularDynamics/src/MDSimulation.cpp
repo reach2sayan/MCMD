@@ -203,7 +203,7 @@ double MDSimulation<D>::refreshVerletLists(bool calc, bool countRadial){
 				double hl = histogramLength;
 
 				if(r_abs < hl)
-					radial[static_cast<Eigen::Index>(r_abs/hl * hr) + 1]++;
+					radial[static_cast<Eigen::Index>(r_abs/hl * hr)]++;
 				if(dim == 2){
 					if (abs(r_[0]) < hl && abs(r_[1]) < hl){
 						directional(static_cast<Eigen::Index>((r_[0] / (2. * hl) + 0.5)*hr), static_cast<Eigen::Index>((r_[1] / (2*hl) + 0.5) * hr))++;
