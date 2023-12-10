@@ -13,6 +13,10 @@
 #include "AndersonThermostat.hpp"
 #endif
 
+#ifndef __MDCONSTANTS_HPP__
+#include "constants.hpp"
+#endif
+
 int plotMode = 0;
 float* colorHue(float h) {	// h=0..1
 	float rgb[3];
@@ -207,10 +211,10 @@ void keyboard(unsigned char key,[[maybe_unused]] int mx, [[maybe_unused]] int my
 			sim->pause = !sim->pause;
 			break;  // "p" toggles pause
 		case 43:
-			sim->getThermostat()->setT(sim->getThermostat()->getT() * SQR_2_5);
+			sim->getThermostat()->setT(sim->getThermostat()->getT() * MDConstants::SQR_2_5);
 			break; // -/+ changes Temperature
 		case 45:
-			sim->getThermostat()->setT(sim->getThermostat()->getT() / SQR_2_5);
+			sim->getThermostat()->setT(sim->getThermostat()->getT() / MDConstants::SQR_2_5);
 			break;
 		case 114:
 			sim->resetDirectionalDistribution();

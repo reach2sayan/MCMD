@@ -26,6 +26,8 @@ link_directories(${Eigen_INCLUDE_DIRS})
 add_executable(md	
 	${PROJECT_SOURCE_DIR}/src/Thermostat-impl.cpp
 	${PROJECT_SOURCE_DIR}/src/AndersonThermostat.cpp
+	${PROJECT_SOURCE_DIR}/src/Calculator.cpp
+	${PROJECT_SOURCE_DIR}/src/LJCalculator.cpp
 	${PROJECT_SOURCE_DIR}/src/MDParticle.cpp
 	${PROJECT_SOURCE_DIR}/src/MDSimulation.cpp
 	${PROJECT_SOURCE_DIR}/src/glutSetup2d-impl.cpp

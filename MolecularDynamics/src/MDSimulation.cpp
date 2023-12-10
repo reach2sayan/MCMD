@@ -1,16 +1,16 @@
 #include <iostream>
 #include "MDSimulation.hpp"
+#include "constants.hpp"
+using namespace MDConstants;
 
-extern constexpr int HISTOGRAM_RESOLUTION = 201;
 template<int D>
-MDSimulation<D>::MDSimulation(int dim_, double dt_, ForceFunc f, PotentialFunc p, double r_inter_, double r_verlet_, int verletUpdate_) : 
+MDSimulation<D>::MDSimulation(int dim_, double dt_, CalculatorType ctype, double r_inter_, double r_verlet_, int verletUpdate_) : 
 	particles(std::make_unique<MDParticleList<D>>()),
 	pause(false),
 	graphDataFirst(0),
 	graphDataLast(0),
 	thermo{std::make_unique<AndersonThermostat<D>>(this, 0, 10)},
-	pot(p),
-	force(f),
+	calculator(CalculatorFactory<D>::Get()->CreateCalculator(ctype)),
 	dt(dt_),
 	t(0),
 	r_inter(r_inter_),
@@ -189,12 +189,12 @@ double MDSimulation<D>::refreshVerletLists(bool calc, bool countRadial){
 
 	for(auto entry = particles->begin(); entry != particles->end(); entry++){
 		(*entry)->verletList->clear();
-		for(auto verlet = entry+1 ; verlet < particles->end(); verlet++){
+		for(auto verlet = entry+1 ; verlet != particles->end(); verlet++){
 			r_ = (*entry)->r - (*verlet)->r;
 			if(periodic)
 				for(int i = 0; i < dim; i++)
 					if (abs(r_[i]) > 0.5 * simBox[i])
-						r_[i] -= copysign(simBox[i],r_[i]);
+						r_[i] -= std::copysign(simBox[i],r_[i]);
 			r_abs = r_.norm();
 
 			if(countRadial){
@@ -217,8 +217,8 @@ double MDSimulation<D>::refreshVerletLists(bool calc, bool countRadial){
 
 			(*entry)->verletList->push_back(*verlet);
 			if(calc && (r_abs < r_inter || r_inter == 0)){
-				f_ = force(r_);
-				pot_ += pot(r_);
+				f_ = calculator->ForceFunc(r_);
+				pot_ += calculator->PotentialFunc(r_);
 				(*entry)->a += f_;
 				(*verlet)->a -= f_;
 			}
@@ -251,8 +251,8 @@ double MDSimulation<D>::velocityVerletForce(){
 			if (r_inter_2 > 0 && (r_.squaredNorm() > r_inter_2))
 				continue;
 
-			f_ = force(r_);
-			pot_ += pot(r_);
+			f_ = calculator->ForceFunc(r_);
+			pot_ += calculator->PotentialFunc(r_);
 			particle->a += f_;
 			verlet->a -= f_;
 		}

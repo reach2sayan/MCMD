@@ -2,6 +2,7 @@
 #define __MDSIMULATION_HPP__
 
 #include "MDParticle.hpp"
+#include "Calculator.hpp"
 #include "AndersonThermostat.hpp"
 
 typedef struct graphData_t{
@@ -17,13 +18,13 @@ class MDSimulation{
 		using Matrix = typename MDParticle<D>::Matrix;
 		using MatrixHistogram = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
 		using VectorHistogram = Eigen::Matrix<double, Eigen::Dynamic, 1>;
-		using PotentialFunc = double(*)(const Vector&);
-		using ForceFunc = Vector(*)(const Vector&);
+//		using PotentialFunc = double(*)(const Vector&);
+//		using ForceFunc = Vector(*)(const Vector&);
 		using InitPositionFunc = Vector(*)(int);
 		using InitVelocityFunc = InitPositionFunc;
 
 	public:
-		MDSimulation(int dim, double dt, ForceFunc f, PotentialFunc p, double r_inter = 0, double r_verlet = 0, int verletUpdate = 0);
+		MDSimulation(int dim, double dt, CalculatorType ctype, double r_inter = 0, double r_verlet = 0, int verletUpdate = 0);
 		~MDSimulation() = default;
 
 		void initSimulation(bool periodic_, const Vector simBox_ , InitPositionFunc r0_, InitVelocityFunc v0_, int histogramResolution_ , double histogramLength_ = 0.5);
@@ -54,8 +55,7 @@ class MDSimulation{
 		void ApplyPeriodicBoundaryCondition(MDParticle<D>* particle);
 
 		std::unique_ptr<AndersonThermostat<D>> thermo;
-		PotentialFunc pot;
-		ForceFunc force;
+		Calculator<D>* calculator;
 		double dt, t, r_inter, r_verlet, eKin, ePot, ePotMin, histogramLength;
 		Vector simBox;
 		VectorHistogram radial;

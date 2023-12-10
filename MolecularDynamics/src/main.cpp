@@ -1,21 +1,7 @@
+#include "Calculator.hpp"
 #include "MDSimulation.hpp"
 #include "AndersonThermostat.hpp"
 #include "glutSetup2d.hpp"
-
-template<int D>
-typename MDParticle<D>::Vector f(const typename MDParticle<D>::Vector& r){
-	double r2 = r.squaredNorm();
-	double r4 = r2*r2;
-	double r8 = r4*r4;
-	return 24.0 * SIGMA_6 * ((2 * SIGMA_6) / (r8*r4*r2) - 1 / r8) * r;
-}
-
-template<int D>
-double pot(const typename MDParticle<D>::Vector& r){
-	double r2 = r.squaredNorm();
-	double r4 = r2*r2;
-	return 4.0 * SIGMA_6 * (SIGMA_6 / (r4*r4*r4) - 1 / (r4*r2));
-}
 
 constexpr int DEFAULT_PARTICLES = 2;
 constexpr double DEFAULT_TIMESTEP = 0.001;
@@ -45,7 +31,7 @@ int main(int argc, char* argv[]){	// Args: n, dt, nue, temp_start [, glut-Option
 	else
 		return 1;
 
-	std::unique_ptr<MDSimulation<DIMENSION>> sim = std::make_unique<MDSimulation<DIMENSION>>(DIMENSION, dt, f<DIMENSION>, pot<DIMENSION>, 0.15, 0.22, 10);
+	std::unique_ptr<MDSimulation<DIMENSION>> sim = std::make_unique<MDSimulation<DIMENSION>>(DIMENSION, dt, CalculatorType::LJ , 0.15, 0.22, 10);
 	for (int i = 0; i < n; i++){
 		MDParticle<DIMENSION>* particle = new MDParticle<DIMENSION>();
 		sim->particles->push_back(particle);
