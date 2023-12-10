@@ -17,8 +17,8 @@ double pot(const typename MDParticle<D>::Vector& r){
 	return 4.0 * SIGMA_6 * (SIGMA_6 / (r4*r4*r4) - 1 / (r4*r2));
 }
 
-constexpr int DEFAULT_PARTICLES = 10;
-constexpr double DEFAULT_TIMESTEP = 0.01;
+constexpr int DEFAULT_PARTICLES = 4;
+constexpr double DEFAULT_TIMESTEP = 0.001;
 constexpr double DEFAULT_NU = 1;
 constexpr double DEFAULT_TEMP_START = 0.5;
 constexpr int DIMENSION = 2;
@@ -51,8 +51,8 @@ int main(int argc, char* argv[]){	// Args: n, dt, nue, temp_start [, glut-Option
 		sim->particles->push_back(particle);
 	}
 
-	sim->getThermostat().setT(temp_start);
-	sim->getThermostat().setNu(nu);
+	sim->getThermostat()->setT(temp_start);
+	sim->getThermostat()->setNu(nu);
 
 	MDParticle<DIMENSION>::Vector arr1 = MDParticle<DIMENSION>::Vector::Ones();
 	sim->initSimulation(true, arr1, nullptr, nullptr, 400, 0.15);

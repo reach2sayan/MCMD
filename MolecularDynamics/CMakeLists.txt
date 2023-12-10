@@ -24,6 +24,7 @@ set(GLUT_LIBRARY "/usr/lib/x86_64-linux-gnu/libglut.so" )
 
 link_directories(${Eigen_INCLUDE_DIRS})
 add_executable(md	
+	${PROJECT_SOURCE_DIR}/src/Thermostat-impl.cpp
 	${PROJECT_SOURCE_DIR}/src/AndersonThermostat.cpp
 	${PROJECT_SOURCE_DIR}/src/MDParticle.cpp
 	${PROJECT_SOURCE_DIR}/src/MDSimulation.cpp

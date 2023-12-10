@@ -37,21 +37,19 @@ void MDSimulation<D>::initSimulation(bool periodic_, const Vector simBox_, InitP
 			particle->r = r0_(i++);
 	}
 	else{
-		int n = ceil(pow(particles->size(), 1./dim));
+		double n = ceil(pow(static_cast<double>(particles->size()), 1./dim));
 		auto particle = particles->begin();
 		switch(dim){
 			case 2:
-				for (int i = 0; i < n; i++){
-					for(int j = 0; j < n; j++){
+				for (int i = 0; i < n; i++)
+					for(int j = 0; j < n; j++)
 						if(particle < particles->end()){
 							(*particle)->r[0] = static_cast<double>(i * simBox[0]/n);
 							if (j & 1)
-								(*particle)->r[1] += 1.0/(2.0*n);
+								(*particle)->r[0] += 1.0/(2.0*n);
 							(*particle)->r[1] = static_cast<double>(j * simBox[1]/n);
 							particle++;
 						}
-					}
-				}
 				break;
 			case 3:
 				for (int i = 0; i < n; i++){
@@ -137,7 +135,7 @@ void MDSimulation<D>::updateGraphs(){
 	if (pause)
 		return;
 
-	graphDataLast = graphDataLast->next = new graphData_t;
+	graphDataLast = (graphDataLast->next = new graphData_t);
 	// The first list entry (graphDataFirst) contains the maximum values of the graphs (for normalization).
 	// Assignment of new values and query for wether they are greater than last maximum can be combined:
 	
@@ -171,7 +169,7 @@ void MDSimulation<D>::resetGraphs(){
 	else{
 		graphDataFirst = graphDataLast = new graphData_t;
 		graphDataFirst->eKin = graphDataFirst->ePot = 0;
-		graphDataFirst->next = 0;
+		graphDataFirst->next = nullptr;
 	}
 }
 
@@ -187,17 +185,17 @@ double MDSimulation<D>::refreshVerletLists(bool calc, bool countRadial){
 	Vector r_, f_;
 	if (calc)
 		for(auto& particle : *particles)
-			particle->a *= 0;
+			particle->a = Vector::Zero();
 
 	for(auto entry = particles->begin(); entry != particles->end(); entry++){
 		(*entry)->verletList->clear();
-		for(auto verlet = ++entry; verlet != particles->end(); verlet++){
+		for(auto verlet = entry+1 ; verlet < particles->end(); verlet++){
 			r_ = (*entry)->r - (*verlet)->r;
 			if(periodic)
 				for(int i = 0; i < dim; i++)
 					if (abs(r_[i]) > 0.5 * simBox[i])
 						r_[i] -= copysign(simBox[i],r_[i]);
-			r_abs = sqrt(r_.squaredNorm());
+			r_abs = r_.norm();
 
 			if(countRadial){
 
@@ -237,18 +235,17 @@ double MDSimulation<D>::velocityVerletForce(){
 	Vector f_, r_;
 
 	for (auto& particle : *particles)
-		particle->a *= 0 ;
+		particle->a = Vector::Zero();
 
 	// address every pair of particles only once:
-
-	for(auto entry = particles->begin(); entry != particles->end(); entry++){
-		for(auto verlet = (*entry)->verletList->begin(); verlet != (*entry)->verletList->end(); verlet++){
-
-			r_ = (*entry)->r - (*verlet)->r;
+	
+	for(auto& particle : *particles){
+		for(auto& verlet : *(particle->verletList)){
+			r_ = particle->r - verlet->r;
 			if(periodic){
 				for(int i = 0; i < dim; i++){
 					if (abs(r_[i]) > 0.5*simBox[i])
-						r_[i] -= copysign(simBox[i],r_[i]);
+						r_[i] -= std::copysign(simBox[i],r_[i]);
 				}
 			}
 			if (r_inter_2 > 0 && (r_.squaredNorm() > r_inter_2))
@@ -256,7 +253,8 @@ double MDSimulation<D>::velocityVerletForce(){
 
 			f_ = force(r_);
 			pot_ += pot(r_);
-			(*entry)->a += f_;
+			particle->a += f_;
+			verlet->a -= f_;
 		}
 	}
 	return pot_;

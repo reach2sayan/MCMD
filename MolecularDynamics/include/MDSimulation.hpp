@@ -35,14 +35,14 @@ class MDSimulation{
 		VectorHistogram getRadialDistribution() const {return radial.normalized(); }
 		int getHistogramResolution() const { return histogramResolution; }
 
-		void resetDirectionalDistribution() { directional *= 0; }
+		void resetDirectionalDistribution() { directional = MatrixHistogram::Zero(histogramResolution,histogramResolution); }
 		MatrixHistogram getDirectionalDistribution() const;
 
 		double getDt() const { return dt; }
 		double getT() const { return t; }
 		int getDim() const { return dim; }
 		double getEPotMin() const { return ePotMin; }
-		AndersonThermostat<D>& getThermostat() const { return *thermo; }
+		AndersonThermostat<D>* getThermostat() { return thermo.get(); }
 
 		std::unique_ptr<MDParticleList<D>> particles;
 		bool pause;

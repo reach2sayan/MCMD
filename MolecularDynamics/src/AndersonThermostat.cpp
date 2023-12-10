@@ -8,38 +8,71 @@ constexpr auto M = 397;
 constexpr auto HI = 0x80000000;
 constexpr auto LO = 0x7fffffff;
 constexpr auto MAX = 0xFFFFFFFF;
-//std::mt19937_64 mersenneTwister{};
+std::mt19937_64 mersenneTwister{};
 
-double mersenneTwister();
+//double mersenneTwister();
 
 template<int D>
 void AndersonThermostat<D>::execute(){
 
-	if (sim->pause)
+	if (this->sim->pause)
 		return;
 
-	for (auto& particle : *(sim->particles)){
+	for (auto& particle : *(this->sim->particles)){
 
-		double u1 = log(1.0 - mersenneTwister());
-		double u2 = TWOPI * mersenneTwister();
-		int dim = sim->getDim();
-		double s = sin(u2), c = cos(u2);
-		switch(dim){
-			case 2:
-				particle->v[0] = std::sqrt(temp*u1)*c;
-				particle->v[1] = std::sqrt(temp*u1)*s;
-				break;
-			case 3:
-				double u3 = M_PI * mersenneTwister();
-				double s_ = sin(u3), c_ = cos(u3);
-				particle->v[0] = std::sqrt(temp*u1)*s_*c_;
-				particle->v[1] = std::sqrt(temp*u1)*s_*s_;
-				particle->v[2] = std::sqrt(temp*u1)*c_;
-				break;
+		if (mersenneTwister() < p){
+			double u1 = log(1.0 - mersenneTwister());
+			double u2 = TWOPI * mersenneTwister();
+			int dim = this->sim->getDim();
+			double s = sin(u2), c = cos(u2);
+
+			switch(dim){
+				case 2:
+					particle->v[0] = std::sqrt(this->temp*u1)*c;
+					particle->v[1] = std::sqrt(this->temp*u1)*s;
+					break;
+				case 3:
+					double u3 = M_PI * mersenneTwister();
+					double s_ = std::sin(u3), c_ = std::cos(u3);
+					particle->v[0] = std::sqrt(this->temp*u1)*s_*c;
+					particle->v[1] = std::sqrt(this->temp*u1)*s_*s;
+					particle->v[2] = std::sqrt(this->temp*u1)*c_;
+					break;
+			}
 		}
 	}
 }
+
+template<int D>
+inline AndersonThermostat<D>::AndersonThermostat(MDSimulation<D>* sim, double temp, double nu) :
+	Thermostat<D>{sim,temp}, nu{-1.0*nu} {
+		p = 1 - exp(nu*sim->getDt());
+	}
+
+template<int D>
+inline void AndersonThermostat<D>::setNu(const double nu_){
+	nu = (-1.0)*nu_;
+	p = 1 - exp(nu_*this->sim->getDt());
+}
+
+template<int D>
+inline double AndersonThermostat<D>::getNu() const {
+	return (-1.0)*nu;
+}
+
+template<int D>
+inline void AndersonThermostat<D>::setT(const double temp) { 
+	this->temp = -2.0*temp;
+}
+
+template<int D>
+inline double AndersonThermostat<D>::getT() const {
+	return -0.5*this->temp;
+}
+template class AndersonThermostat<2>;
+/*
 double mersenneTwister(){
+
 	static constexpr uint32_t seed = 5489UL;
 	static constexpr uint32_t A[2] = { 0, 0x9908b0df };
 	static uint32_t y[N];
@@ -79,32 +112,4 @@ double mersenneTwister(){
 	e ^= (e >> 18);
 
 	return static_cast<double>(e) / MAX;
-}
-
-template<int D>
-inline AndersonThermostat<D>::AndersonThermostat(MDSimulation<D>* sim, double temp, double nu) :
-	sim{sim}, temp{temp}, nu{-nu} {
-		p = 1 - exp(nu*sim->getDt());
-	}
-
-template<int D>
-inline void AndersonThermostat<D>::setNu(const double nu_){
-	nu = (-1.0)*nu_;
-	p = 1 - exp(nu_*sim->getDt());
-}
-
-template<int D>
-inline double AndersonThermostat<D>::getNu() const {
-	return (-1.0)*nu;
-}
-
-template<int D>
-inline void AndersonThermostat<D>::setT(const double temp) { 
-	this->temp = -2.0*temp;
-}
-
-template<int D>
-inline double AndersonThermostat<D>::getT() const {
-	return 0.5*temp;
-}
-template class AndersonThermostat<2>;
+}*/

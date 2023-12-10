@@ -1,24 +1,22 @@
 #ifndef __ANDERSONTHERMOSTAT_HPP__
 #define __ANDERSONTHERMOSTAT_HPP__
 
-template<int D>
-class MDSimulation;
+#include "Thermostat.hpp"
 
 template<int D>
-class AndersonThermostat{
+class AndersonThermostat : public Thermostat<D> {
 
 public:
 	AndersonThermostat(MDSimulation<D>* sim, double temp, double nu);
 
-	void setT(const double temp);
-	double getT() const;
+	void setT(const double temp) override;
+	double getT() const override;
 	void setNu(const double nu);
 	double getNu() const;
   void execute();
 
 private:
-	MDSimulation<D>* sim;
-	double temp, nu;
+	double nu;
 	double p;
 };
 #endif

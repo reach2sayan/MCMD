@@ -72,7 +72,7 @@ void draw(){
 	for(const auto& particle: *(sim->particles)){
 		for (int i = -1; i <= 1; i++){
 			for(int j = -1; j <= 1; j++){
-				if(particle->r[1] + 1 < 1.3){
+				if(particle->r[0] + i < 1.3){
 					if (i == 0 && j == 0) 
 						glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
 					else 
@@ -157,14 +157,14 @@ void draw(){
 
 	glRasterPos2f(-0.28, 1.2);
 	char temp_char[6];
-	double v = sim->getThermostat().getT();
+	double v = sim->getThermostat()->getT();
 	sprintf_s(temp_char, 6, "%04.2f", v);
 
 	glutBitmapString(font, (unsigned char*)"T_soll = ");
 	glutBitmapString(font, (unsigned char*)temp_char);
 	glRasterPos2f(-0.28, 1.15);
 	char nu_char[6];
-	sprintf_s(nu_char, 6, "%04.2f", sim->getThermostat().getNu());
+	sprintf_s(nu_char, 6, "%04.2f", sim->getThermostat()->getNu());
 
 	glutBitmapString(font, (unsigned char*)"Rate = ");
 	glutBitmapString(font, (unsigned char*)nu_char);
@@ -195,7 +195,6 @@ void draw(){
 	glutSwapBuffers();
 }
 
-
 template<int D>
 void keyboard(unsigned char key,[[maybe_unused]] int mx, [[maybe_unused]] int my){
 	MDSimulation<D>* sim = static_cast<MDSimulation<D>*>(glutGetWindowData());
@@ -208,10 +207,10 @@ void keyboard(unsigned char key,[[maybe_unused]] int mx, [[maybe_unused]] int my
 			sim->pause = !sim->pause;
 			break;  // "p" toggles pause
 		case 43:
-			sim->getThermostat().setT(sim->getThermostat().getT() * SQR_2_5);
+			sim->getThermostat()->setT(sim->getThermostat()->getT() * SQR_2_5);
 			break; // -/+ changes Temperature
 		case 45:
-			sim->getThermostat().setT(sim->getThermostat().getT() / SQR_2_5);
+			sim->getThermostat()->setT(sim->getThermostat()->getT() / SQR_2_5);
 			break;
 		case 114:
 			sim->resetDirectionalDistribution();
@@ -225,7 +224,7 @@ template<int D>
 void step(int k){
 	MDSimulation<D>* sim = static_cast<MDSimulation<D>*>(glutGetWindowData());
 
-	sim->getThermostat().execute();
+	sim->getThermostat()->execute();
 	sim->velocityVerletStep(true);
 	if (!sim->pause) sim->updateGraphs();
 
