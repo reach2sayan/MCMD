@@ -1,8 +1,8 @@
-#ifndef __CALCULATOR_HPP__
-#define __CALCULATOR_HPP__
+#ifndef __CALCULATORFACTORY_HPP__
+#define __CALCULATORFACTORY_HPP__
 
-#include <map>
 #include "MDParticle.hpp"
+#include <unordered_map>
 
 enum CalculatorType {LJ};
 
@@ -24,7 +24,7 @@ class CalculatorFactory {
 		CalculatorFactory(const CalculatorFactory&) = delete;
 		CalculatorFactory& operator=(const CalculatorFactory&) = delete;
 
-		using FactoryMap = std::map<CalculatorType,CreateCalculatorFunc<D>>;
+		using FactoryMap = std::unordered_map<CalculatorType,CreateCalculatorFunc<D>>;
 		FactoryMap m_FactoryMap;
 
 	public:
@@ -38,16 +38,5 @@ class CalculatorFactory {
 		void Register(const CalculatorType ctype, CreateCalculatorFunc<D> pfnCreate);
 		Calculator<D>* CreateCalculator(const CalculatorType ctype);
 };
-
-
-
-
-
-
-
-
-
-
-
 
 #endif

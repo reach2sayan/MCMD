@@ -1,14 +1,11 @@
-#include "Calculator.hpp"
+#include "CalculatorFactory.hpp"
 #include "MDSimulation.hpp"
+#include "ThermostatFactory.hpp"
 #include "AndersonThermostat.hpp"
 #include "glutSetup2d.hpp"
+#include "constants.hpp"
 
-constexpr int DEFAULT_PARTICLES = 2;
-constexpr double DEFAULT_TIMESTEP = 0.001;
-constexpr double DEFAULT_NU = 10;
-constexpr double DEFAULT_TEMP_START = 0.1;
-constexpr int DIMENSION = 2;
-
+using namespace MDConstants;
 int main(int argc, char* argv[]){	// Args: n, dt, nue, temp_start [, glut-Optionen]
 	
 	int n;
@@ -31,17 +28,13 @@ int main(int argc, char* argv[]){	// Args: n, dt, nue, temp_start [, glut-Option
 	else
 		return 1;
 
-	std::unique_ptr<MDSimulation<DIMENSION>> sim = std::make_unique<MDSimulation<DIMENSION>>(DIMENSION, dt, CalculatorType::LJ , 0.15, 0.22, 10);
+	std::unique_ptr<MDSimulation<DIMENSION>> sim = std::make_unique<MDSimulation<DIMENSION>>(DIMENSION, dt, CalculatorType::LJ, ThermostatType::ANDERSON, temp_start, nu, 0.15, 0.22, 10);
 	for (int i = 0; i < n; i++){
 		MDParticle<DIMENSION>* particle = new MDParticle<DIMENSION>();
 		sim->particles->push_back(particle);
 	}
 
-	sim->getThermostat()->setT(temp_start);
-	sim->getThermostat()->setNu(nu);
-
-	MDParticle<DIMENSION>::Vector arr1 = MDParticle<DIMENSION>::Vector::Ones();
-	sim->initSimulation(true, arr1, nullptr, nullptr, 400, 0.15);
+	sim->initSimulation(true, MDParticle<DIMENSION>::Vector::Ones(), nullptr, nullptr, 400, 0.15);
 
 	return glutStuff(step<DIMENSION>, draw<DIMENSION>, reshape, keyboard<DIMENSION>, &argc, argv, sim.get(), "MD - Basics");
 }

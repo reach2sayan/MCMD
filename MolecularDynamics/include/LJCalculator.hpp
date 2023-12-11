@@ -1,4 +1,4 @@
-#include "Calculator.hpp"
+#include "CalculatorFactory.hpp"
 
 template<int D>
 class LJCalculator : public Calculator<D> {

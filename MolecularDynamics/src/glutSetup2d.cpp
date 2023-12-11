@@ -9,6 +9,10 @@
 #include "MDParticle.hpp"
 #endif
 
+#ifndef __THERMOSTATFACTORY_HPP__
+#include "ThermostatFactory.hpp"
+#endif
+
 #ifndef __ANDERSONTHERMOSTAT_HPP__
 #include "AndersonThermostat.hpp"
 #endif
@@ -168,7 +172,7 @@ void draw(){
 	glutBitmapString(font, (unsigned char*)temp_char);
 	glRasterPos2f(-0.28, 1.15);
 	char nu_char[6];
-	sprintf_s(nu_char, 6, "%04.2f", sim->getThermostat()->getNu());
+	sprintf_s(nu_char, 6, "%04.2f", static_cast<AndersonThermostat<2>*>(sim->getThermostat())->getNu());
 
 	glutBitmapString(font, (unsigned char*)"Rate = ");
 	glutBitmapString(font, (unsigned char*)nu_char);

@@ -1,15 +1,15 @@
 #include <iostream>
+#include "AndersonThermostat.hpp"
 #include "MDSimulation.hpp"
 #include "constants.hpp"
 using namespace MDConstants;
 
 template<int D>
-MDSimulation<D>::MDSimulation(int dim_, double dt_, CalculatorType ctype, double r_inter_, double r_verlet_, int verletUpdate_) : 
+MDSimulation<D>::MDSimulation(int dim_, double dt_, CalculatorType ctype, ThermostatType ttype, double temp_start, double nu, double r_inter_, double r_verlet_, int verletUpdate_) : 
 	particles(std::make_unique<MDParticleList<D>>()),
 	pause(false),
 	graphDataFirst(0),
 	graphDataLast(0),
-	thermo{std::make_unique<AndersonThermostat<D>>(this, 0, 10)},
 	calculator(CalculatorFactory<D>::Get()->CreateCalculator(ctype)),
 	dt(dt_),
 	t(0),
@@ -22,8 +22,16 @@ MDSimulation<D>::MDSimulation(int dim_, double dt_, CalculatorType ctype, double
 	verletUpdate(verletUpdate_),
 	dim(dim_),
 	histogramResolution(HISTOGRAM_RESOLUTION),
-	periodic(false)
-{}
+	periodic(false){
+
+		ThermostatFactory<DIMENSION>* thermostatFactory = new AndersonThermostatFactory<DIMENSION>();
+		switch(ttype){
+			case ANDERSON:
+				thermo = thermostatFactory->createAndersonThermostat(this, temp_start, nu);
+		}
+		delete thermostatFactory;
+		thermostatFactory = nullptr;
+	}
 
 template<int D>
 void MDSimulation<D>::initSimulation(bool periodic_, const Vector simBox_, InitPositionFunc r0_, InitVelocityFunc v0_, int histogramResolution_, double histogramLength_){
