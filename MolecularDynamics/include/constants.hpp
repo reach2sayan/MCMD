@@ -14,4 +14,7 @@ namespace MDConstants {
 	constexpr double DEFAULT_NU = 10;
 	constexpr double DEFAULT_TEMP_START = 0.1;
 	constexpr int DIMENSION = 2;
+	constexpr double DEFAULT_R_INTER = 0.15;
+	constexpr double DEFAULT_R_VERLET = 0.22;
+	constexpr int DEFAULT_VERLET_UPDATE = 10;
 }

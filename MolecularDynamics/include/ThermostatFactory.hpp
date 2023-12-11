@@ -11,14 +11,11 @@ template<int D>
 class Thermostat {
 
 	public:
-		Thermostat(MDSimulation<D>* sim_, double temp_) : sim(sim_), temp(temp_) {}
-		virtual void setT(const double temp) { this->temp = temp;}
-		virtual double getT() const { return temp; }
+		virtual void setT(const double temp) = 0;
+		virtual double getT() const = 0;
 		virtual void execute() = 0;
-
-	protected:
-		MDSimulation<D>* sim;
-		double temp;
+		virtual void setNu(const double nu) {};
+		virtual double getNu() const {};
 };
 
 

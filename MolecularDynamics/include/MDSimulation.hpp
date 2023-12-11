@@ -5,7 +5,9 @@
 #include "CalculatorFactory.hpp"
 #include "AndersonThermostat.hpp"
 #include "ThermostatFactory.hpp"
+#include "utility.hpp"
 
+using namespace MDConstants;
 typedef struct graphData_t{
 	double eKin, ePot;
 	graphData_t* next;
@@ -23,7 +25,7 @@ class MDSimulation{
 		using InitVelocityFunc = InitPositionFunc;
 
 	public:
-		MDSimulation(int dim, double dt, CalculatorType ctype, ThermostatType ttype, double temp_start, double nu,  double r_inter = 0, double r_verlet = 0, int verletUpdate = 0);
+		MDSimulation(double dt = DEFAULT_TIMESTEP, CalculatorType ctype = CalculatorType::LJ, ThermostatType ttype = ThermostatType::ANDERSON, double r_inter = DEFAULT_R_INTER, double r_verlet = DEFAULT_R_VERLET, int verletUpdate = DEFAULT_VERLET_UPDATE);
 		~MDSimulation() = default;
 
 		void initSimulation(bool periodic_, const Vector simBox_ , InitPositionFunc r0_, InitVelocityFunc v0_, int histogramResolution_ , double histogramLength_ = 0.5);

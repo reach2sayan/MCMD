@@ -5,22 +5,6 @@
 #include "MDSimulation.hpp"
 #endif
 
-#ifndef __MDPARTICLE_HPP__
-#include "MDParticle.hpp"
-#endif
-
-#ifndef __THERMOSTATFACTORY_HPP__
-#include "ThermostatFactory.hpp"
-#endif
-
-#ifndef __ANDERSONTHERMOSTAT_HPP__
-#include "AndersonThermostat.hpp"
-#endif
-
-#ifndef __MDCONSTANTS_HPP__
-#include "constants.hpp"
-#endif
-
 int plotMode = 0;
 float* colorHue(float h) {	// h=0..1
 	float rgb[3];

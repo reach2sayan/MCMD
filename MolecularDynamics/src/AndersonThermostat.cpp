@@ -1,7 +1,6 @@
 #include "AndersonThermostat.hpp"
 #include "ThermostatFactory.hpp"
 #include "MDSimulation.hpp"
-#include "utility.hpp"
 
 using namespace MDConstants;
 
@@ -38,7 +37,7 @@ void AndersonThermostat<D>::execute(){
 
 template<int D>
 inline AndersonThermostat<D>::AndersonThermostat(MDSimulation<D>* sim_, double temp_, double nu_) :
-	Thermostat<D>{sim_,temp_}, nu{-1.0*nu_} {
+	sim(sim_),temp(temp_), nu(-1.0*nu_) {
 		p = 1 - exp(-1*nu_*sim_->getDt());
 	}
 
