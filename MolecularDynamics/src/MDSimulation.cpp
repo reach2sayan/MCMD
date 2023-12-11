@@ -1,8 +1,9 @@
 #include "MDSimulation.hpp"
+#define ZERO_T 0
 using namespace MDConstants;
 
 template<int D>
-MDSimulation<D>::MDSimulation(double dt_, CalculatorType ctype, ThermostatType ttype, double r_inter_, double r_verlet_, int verletUpdate_) : 
+MDSimulation<D>::MDSimulation(double dt_, CalculatorType ctype, ThermostatType ttype, double r_inter_, double r_verlet_, int verletUpdate_) :
 	particles(std::make_unique<MDParticleList<D>>()),
 	pause(false),
 	graphDataFirst(0),
@@ -24,7 +25,7 @@ MDSimulation<D>::MDSimulation(double dt_, CalculatorType ctype, ThermostatType t
 		ThermostatFactory<D>* thermostatFactory = new AndersonThermostatFactory<D>();
 		switch(ttype){
 			case ANDERSON:
-				thermo = thermostatFactory->createAndersonThermostat(this, 0, 10);
+				thermo = thermostatFactory->createAndersonThermostat(this, DEFAULT_TEMP_START, DEFAULT_ANDERSON_NU);
 		}
 	}
 
@@ -77,7 +78,7 @@ void MDSimulation<D>::initSimulation(bool periodic_, const Vector simBox_, InitP
 	}
 	else{
 		for(auto& particle: *particles)
-			particle->v = Vector::Zero();
+			particle->v *= 0;
 	}
 	
 	periodic = periodic_;
@@ -86,9 +87,8 @@ void MDSimulation<D>::initSimulation(bool periodic_, const Vector simBox_, InitP
 	directional = MatrixHistogram::Zero(HISTOGRAM_RESOLUTION, HISTOGRAM_RESOLUTION);
 	ePot = ePotMin = refreshVerletLists(true, true);
 	eKin = 0;
-	for (const auto& particle : *particles){
+	for (const auto& particle : *particles)
 		eKin += particle->v.squaredNorm();
-	}
 
 	eKin *= 0.5;
 	resetGraphs();
@@ -238,7 +238,7 @@ double MDSimulation<D>::velocityVerletForce(){
 	Vector f_, r_;
 
 	for (auto& particle : *particles)
-		particle->a = Vector::Zero();
+		particle->a *= 0;
 
 	// address every pair of particles only once:
 	

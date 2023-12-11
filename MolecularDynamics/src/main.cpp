@@ -27,7 +27,7 @@ int main(int argc, char* argv[]){	// Args: n, dt, nue, temp_start [, glut-Option
 	else
 		return 1;
 
-	std::unique_ptr<MDSimulation<DIMENSION>> sim = std::make_unique<MDSimulation<DIMENSION>>(dt);
+	MDSimulation<DIMENSION>* sim = MDSimulation<DIMENSION>::GetSimulationInstance(dt);
 	for (int i = 0; i < n; i++){
 		MDParticle<DIMENSION>* particle = new MDParticle<DIMENSION>();
 		sim->particles->push_back(particle);
@@ -36,6 +36,6 @@ int main(int argc, char* argv[]){	// Args: n, dt, nue, temp_start [, glut-Option
 	sim->getThermostat()->setNu(nu);
 	sim->initSimulation(true, MDParticle<DIMENSION>::Vector::Ones(), nullptr, nullptr, 400, 0.15);
 
-	return glutStuff(step<DIMENSION>, draw<DIMENSION>, reshape, keyboard<DIMENSION>, &argc, argv, sim.get(), "MD - Basics");
+	return glutStuff(step<DIMENSION>, draw<DIMENSION>, reshape, keyboard<DIMENSION>, &argc, argv, sim, "MD - Basics");
 }
 

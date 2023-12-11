@@ -23,11 +23,17 @@ class MDSimulation{
 		using VectorHistogram = Eigen::Matrix<double, Eigen::Dynamic, 1>;
 		using InitPositionFunc = Vector(*)(int);
 		using InitVelocityFunc = InitPositionFunc;
+	
+	private:
+		MDSimulation(double dt = DEFAULT_TIMESTEP, CalculatorType ctype = CalculatorType::LJ, ThermostatType ttype = ThermostatType::ANDERSON, double r_inter = DEFAULT_R_INTER, double r_verlet = DEFAULT_R_VERLET, int verletUpdate = DEFAULT_VERLET_UPDATE);
+		static MDSimulation<D>* instance;
 
 	public:
-		MDSimulation(double dt = DEFAULT_TIMESTEP, CalculatorType ctype = CalculatorType::LJ, ThermostatType ttype = ThermostatType::ANDERSON, double r_inter = DEFAULT_R_INTER, double r_verlet = DEFAULT_R_VERLET, int verletUpdate = DEFAULT_VERLET_UPDATE);
 		~MDSimulation() = default;
+		MDSimulation<D>(const MDSimulation<D>&) = delete;
+    MDSimulation<D>& operator=(const MDSimulation<D>&) = delete;
 
+		static MDSimulation<D>* GetSimulationInstance(double dt = DEFAULT_TIMESTEP, CalculatorType ctype = CalculatorType::LJ, ThermostatType ttype = ThermostatType::ANDERSON, double r_inter = DEFAULT_R_INTER, double r_verlet = DEFAULT_R_VERLET, int verletUpdate = DEFAULT_VERLET_UPDATE);
 		void initSimulation(bool periodic_, const Vector simBox_ , InitPositionFunc r0_, InitVelocityFunc v0_, int histogramResolution_ , double histogramLength_ = 0.5);
 		void velocityVerletStep(bool);
 		void updateGraphs();
@@ -64,4 +70,14 @@ class MDSimulation{
 		int verletSteps, verletUpdate, dim, histogramResolution;
 		bool periodic;
 };
+
+template<int D>
+MDSimulation<D>* MDSimulation<D>::instance = nullptr;
+
+template<int D>
+MDSimulation<D>* MDSimulation<D>::GetSimulationInstance(double dt, CalculatorType ctype, ThermostatType ttype, double r_inter, double r_verlet, int verletUpdate){
+	if (!instance)
+		instance = new MDSimulation<D>(dt,ctype,ttype,r_inter,r_verlet,verletUpdate);
+	return instance;	
+}
 #endif
