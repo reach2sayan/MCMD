@@ -44,9 +44,8 @@ float* colorHue(float h) {	// h=0..1
 	return rgb;
 }
 
-template<int D>
 void draw(){
-	MDSimulation<D>* sim = static_cast<MDSimulation<D>*>(glutGetWindowData());
+	MDSimulation* sim = static_cast<MDSimulation*>(glutGetWindowData());
 	void* font = GLUT_BITMAP_9_BY_15;
 	int i, j;
 
@@ -118,7 +117,7 @@ void draw(){
 	if (plotMode == 2){
 		glBegin(GL_QUADS);
 		{
-			typename MDParticle<D>::Matrix radial = sim->getDirectionalDistribution();
+			typename MDParticle::Matrix radial = sim->getDirectionalDistribution();
 			int hr = sim->getHistogramResolution();
 			for (i = 0; i < hr; i++) for (j = 0; j < hr; j++){
 				float* rgb = colorHue(radial(i,j));
@@ -156,7 +155,7 @@ void draw(){
 	glutBitmapString(font, (unsigned char*)temp_char);
 	glRasterPos2f(-0.28, 1.15);
 	char nu_char[6];
-	sprintf_s(nu_char, 6, "%04.2f", static_cast<AndersonThermostat<2>*>(sim->getThermostat())->getNu());
+	sprintf_s(nu_char, 6, "%04.2f", sim->getThermostat()->getNu());
 
 	glutBitmapString(font, (unsigned char*)"Rate = ");
 	glutBitmapString(font, (unsigned char*)nu_char);
@@ -187,9 +186,8 @@ void draw(){
 	glutSwapBuffers();
 }
 
-template<int D>
 void keyboard(unsigned char key,[[maybe_unused]] int mx, [[maybe_unused]] int my){
-	MDSimulation<D>* sim = static_cast<MDSimulation<D>*>(glutGetWindowData());
+	MDSimulation* sim = static_cast<MDSimulation*>(glutGetWindowData());
 
 	switch (key){
 		case 27: 
@@ -212,9 +210,8 @@ void keyboard(unsigned char key,[[maybe_unused]] int mx, [[maybe_unused]] int my
 	}
 }
 
-template<int D>
 void step(int k){
-	MDSimulation<D>* sim = static_cast<MDSimulation<D>*>(glutGetWindowData());
+	MDSimulation* sim = static_cast<MDSimulation*>(glutGetWindowData());
 
 	sim->getThermostat()->execute();
 	sim->velocityVerletStep(true);
@@ -230,7 +227,7 @@ void step(int k){
 		}
 		else k++;*/
 
-	glutTimerFunc(0, step<D>, k);
+	glutTimerFunc(0, step, k);
 	glutPostRedisplay();
 }
 

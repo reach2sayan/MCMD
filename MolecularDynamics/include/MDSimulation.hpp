@@ -13,27 +13,26 @@ typedef struct graphData_t{
 	graphData_t* next;
 } graphData_t;
 
-template<int D>
 class MDSimulation{
 
 	public:
-		using Vector = typename MDParticle<D>::Vector;
-		using Matrix = typename MDParticle<D>::Matrix;
+		using Vector = typename MDParticle::Vector;
+		using Matrix = typename MDParticle::Matrix;
 		using MatrixHistogram = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
 		using VectorHistogram = Eigen::Matrix<double, Eigen::Dynamic, 1>;
 		using InitPositionFunc = Vector(*)(int);
 		using InitVelocityFunc = InitPositionFunc;
 	
 	private:
-		MDSimulation(double dt = DEFAULT_TIMESTEP, CalculatorType ctype = CalculatorType::LJ, ThermostatType ttype = ThermostatType::ANDERSON, double r_inter = DEFAULT_R_INTER, double r_verlet = DEFAULT_R_VERLET, int verletUpdate = DEFAULT_VERLET_UPDATE);
-		static MDSimulation<D>* instance;
+		MDSimulation(int dim_ = 2, double dt = DEFAULT_TIMESTEP, CalculatorType ctype = CalculatorType::LJ, ThermostatType ttype = ThermostatType::ANDERSON, double r_inter = DEFAULT_R_INTER, double r_verlet = DEFAULT_R_VERLET, int verletUpdate = DEFAULT_VERLET_UPDATE);
+		static MDSimulation* instance;
 
 	public:
 		~MDSimulation() = default;
-		MDSimulation<D>(const MDSimulation<D>&) = delete;
-    MDSimulation<D>& operator=(const MDSimulation<D>&) = delete;
+		MDSimulation(const MDSimulation&) = delete;
+    MDSimulation& operator=(const MDSimulation&) = delete;
 
-		static MDSimulation<D>* GetSimulationInstance(double dt = DEFAULT_TIMESTEP, CalculatorType ctype = CalculatorType::LJ, ThermostatType ttype = ThermostatType::ANDERSON, double r_inter = DEFAULT_R_INTER, double r_verlet = DEFAULT_R_VERLET, int verletUpdate = DEFAULT_VERLET_UPDATE);
+		static MDSimulation* GetSimulationInstance(int dim = 2, double dt = DEFAULT_TIMESTEP, CalculatorType ctype = CalculatorType::LJ, ThermostatType ttype = ThermostatType::ANDERSON, double r_inter = DEFAULT_R_INTER, double r_verlet = DEFAULT_R_VERLET, int verletUpdate = DEFAULT_VERLET_UPDATE);
 		void initSimulation(bool periodic_, const Vector simBox_ , InitPositionFunc r0_, InitVelocityFunc v0_, int histogramResolution_ , double histogramLength_ = 0.5);
 		void velocityVerletStep(bool);
 		void updateGraphs();
@@ -50,19 +49,19 @@ class MDSimulation{
 		double getT() const { return t; }
 		int getDim() const { return dim; }
 		double getEPotMin() const { return ePotMin; }
-		Thermostat<D>* getThermostat() { return thermo; }
+		Thermostat* getThermostat() { return thermo; }
 
-		std::unique_ptr<MDParticleList<D>> particles;
+		std::unique_ptr<MDParticleList> particles;
 		bool pause;
 		graphData_t *graphDataFirst, *graphDataLast; // graphDataFirst contains max values and leads to values for t=0
 
 	private:
 		double refreshVerletLists(bool, bool);
 		double velocityVerletForce();
-		void ApplyPeriodicBoundaryCondition(MDParticle<D>* particle);
+		void ApplyPeriodicBoundaryCondition(MDParticle* particle);
 
-		Thermostat<D>* thermo;
-		Calculator<D>* calculator;
+		Thermostat* thermo;
+		Calculator* calculator;
 		double dt, t, r_inter, r_verlet, eKin, ePot, ePotMin, histogramLength;
 		Vector simBox;
 		VectorHistogram radial;
@@ -71,13 +70,4 @@ class MDSimulation{
 		bool periodic;
 };
 
-template<int D>
-MDSimulation<D>* MDSimulation<D>::instance = nullptr;
-
-template<int D>
-MDSimulation<D>* MDSimulation<D>::GetSimulationInstance(double dt, CalculatorType ctype, ThermostatType ttype, double r_inter, double r_verlet, int verletUpdate){
-	if (!instance)
-		instance = new MDSimulation<D>(dt,ctype,ttype,r_inter,r_verlet,verletUpdate);
-	return instance;	
-}
 #endif

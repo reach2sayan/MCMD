@@ -12,28 +12,26 @@
 #include <memory>
 #include <vector>
 
-template<int D>
 class MDParticle;
 
-template<int D>
-using MDParticleList = std::vector<MDParticle<D>*>;
+using MDParticleList = std::vector<MDParticle*>;
 
-template <int D>
 class MDParticle{
 
 	public:
-		using Vector = Eigen::Matrix<double, D, 1>;
-		using Matrix = Eigen::Matrix<double, D, D>;
+		using Vector = Eigen::Matrix<double, Eigen::Dynamic , 1>;
+		using Matrix = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
 		enum { NeedsToAlign = (sizeof(Vector)%16)==0 };
 
 	public:
-		explicit MDParticle();
+		MDParticle() = delete;
+		explicit MDParticle(const int dim);
 		MDParticle(const Vector& r_, const Vector& v_);
 		~MDParticle() = default;
 		
 		int dim = 2;
 		Vector r, v, a;
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF(NeedsToAlign)
-		std::unique_ptr<MDParticleList<D>> verletList;
+		std::unique_ptr<MDParticleList> verletList;
 };
 #endif

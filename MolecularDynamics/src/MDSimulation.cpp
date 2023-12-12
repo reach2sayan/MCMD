@@ -2,35 +2,41 @@
 #define ZERO_T 0
 using namespace MDConstants;
 
-template<int D>
-MDSimulation<D>::MDSimulation(double dt_, CalculatorType ctype, ThermostatType ttype, double r_inter_, double r_verlet_, int verletUpdate_) :
-	particles(std::make_unique<MDParticleList<D>>()),
+MDSimulation* MDSimulation::instance = nullptr;
+
+MDSimulation* MDSimulation::GetSimulationInstance(int dim, double dt, CalculatorType ctype, ThermostatType ttype, double r_inter, double r_verlet, int verletUpdate){
+	if (!instance)
+		instance = new MDSimulation(dim, dt,ctype,ttype,r_inter,r_verlet,verletUpdate);
+	return instance;	
+}
+
+MDSimulation::MDSimulation(int dim_, double dt_, CalculatorType ctype, ThermostatType ttype, double r_inter_, double r_verlet_, int verletUpdate_) :
+	particles(std::make_unique<MDParticleList>()),
 	pause(false),
 	graphDataFirst(0),
 	graphDataLast(0),
-	calculator(CalculatorFactory<D>::Get()->CreateCalculator(ctype)),
+	calculator(CalculatorFactory::Get()->CreateCalculator(ctype)),
 	dt(dt_),
 	t(0),
 	r_inter(r_inter_),
 	r_verlet(r_verlet_),
-	simBox(Vector::Zero()),
+	simBox(Vector::Zero(dim_)),
 	radial(VectorHistogram::Zero(HISTOGRAM_RESOLUTION)),
 	directional(MatrixHistogram::Zero(HISTOGRAM_RESOLUTION,HISTOGRAM_RESOLUTION)),
 	verletSteps(0),
 	verletUpdate(verletUpdate_),
-	dim(D),
+	dim(dim_),
 	histogramResolution(HISTOGRAM_RESOLUTION),
 	periodic(false){
 
-		ThermostatFactory<D>* thermostatFactory = new AndersonThermostatFactory<D>();
+		ThermostatFactory* thermostatFactory = new AndersonThermostatFactory();
 		switch(ttype){
 			case ANDERSON:
 				thermo = thermostatFactory->createAndersonThermostat(this, DEFAULT_TEMP_START, DEFAULT_ANDERSON_NU);
 		}
 	}
 
-template<int D>
-void MDSimulation<D>::initSimulation(bool periodic_, const Vector simBox_, InitPositionFunc r0_, InitVelocityFunc v0_, int histogramResolution_, double histogramLength_){
+void MDSimulation::initSimulation(bool periodic_, const Vector simBox_, InitPositionFunc r0_, InitVelocityFunc v0_, int histogramResolution_, double histogramLength_){
 
 	histogramResolution = histogramResolution_ == 0 ? histogramResolution_ : HISTOGRAM_RESOLUTION;
 	histogramLength = histogramLength_;
@@ -96,14 +102,12 @@ void MDSimulation<D>::initSimulation(bool periodic_, const Vector simBox_, InitP
 	pause = true;
 }
 
-template<int D>
-inline void MDSimulation<D>::ApplyPeriodicBoundaryCondition(MDParticle<D>* particle){
+inline void MDSimulation::ApplyPeriodicBoundaryCondition(MDParticle* particle){
 	for (int i = 0; i < dim; i++)
 		particle->r[i] -= simBox[i] * floor(particle->r[i] / simBox[i]);
 }
 
-template<int D>
-void MDSimulation<D>::velocityVerletStep(bool countRadial){
+void MDSimulation::velocityVerletStep(bool countRadial){
 	if (!pause) {
 		for (auto& particle : *particles){
 			particle->v += 0.5*dt*particle->a;
@@ -133,8 +137,7 @@ void MDSimulation<D>::velocityVerletStep(bool countRadial){
 }
 
 // has to be called after the velocityVerletStep function to extend the graphs by the last time step
-template<int D>
-void MDSimulation<D>::updateGraphs(){
+void MDSimulation::updateGraphs(){
 	if (pause)
 		return;
 
@@ -155,8 +158,7 @@ void MDSimulation<D>::updateGraphs(){
 		ePotMin = ePot;
 }
 
-template<int D>
-void MDSimulation<D>::resetGraphs(){
+void MDSimulation::resetGraphs(){
 
 	graphData_t* graphData = graphDataFirst;
 	if (graphData){
@@ -176,19 +178,17 @@ void MDSimulation<D>::resetGraphs(){
 	}
 }
 
-template<int D>
-typename MDSimulation<D>::MatrixHistogram MDSimulation<D>::getDirectionalDistribution() const {
+typename MDSimulation::MatrixHistogram MDSimulation::getDirectionalDistribution() const {
 	float max = directional.maxCoeff();
 	return directional/max;
 }
 
-template<int D>
-double MDSimulation<D>::refreshVerletLists(bool calc, bool countRadial){
+double MDSimulation::refreshVerletLists(bool calc, bool countRadial){
 	double r_abs, pot_ = 0;
 	Vector r_, f_;
 	if (calc)
 		for(auto& particle : *particles)
-			particle->a = Vector::Zero();
+			particle->a = Vector::Zero(dim);
 
 	for(auto entry = particles->begin(); entry != particles->end(); entry++){
 		(*entry)->verletList->clear();
@@ -230,8 +230,7 @@ double MDSimulation<D>::refreshVerletLists(bool calc, bool countRadial){
 	return pot_;
 }
 
-template<int D>
-double MDSimulation<D>::velocityVerletForce(){
+double MDSimulation::velocityVerletForce(){
 
 	double pot_ = 0;
 	double r_inter_2 = r_inter*r_inter;
@@ -262,5 +261,3 @@ double MDSimulation<D>::velocityVerletForce(){
 	}
 	return pot_;
 }
-
-template class MDSimulation<2>;

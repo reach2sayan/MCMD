@@ -27,15 +27,15 @@ int main(int argc, char* argv[]){	// Args: n, dt, nue, temp_start [, glut-Option
 	else
 		return 1;
 
-	MDSimulation<DIMENSION>* sim = MDSimulation<DIMENSION>::GetSimulationInstance(dt);
+	MDSimulation* sim = MDSimulation::GetSimulationInstance(DIMENSION, dt);
 	for (int i = 0; i < n; i++){
-		MDParticle<DIMENSION>* particle = new MDParticle<DIMENSION>();
+		MDParticle* particle = new MDParticle(DIMENSION);
 		sim->particles->push_back(particle);
 	}
 	sim->getThermostat()->setT(temp_start);
 	sim->getThermostat()->setNu(nu);
-	sim->initSimulation(true, MDParticle<DIMENSION>::Vector::Ones(), nullptr, nullptr, 400, 0.15);
+	sim->initSimulation(true, MDParticle::Vector::Ones(DIMENSION), nullptr, nullptr, 400, 0.15);
 
-	return glutStuff(step<DIMENSION>, draw<DIMENSION>, reshape, keyboard<DIMENSION>, &argc, argv, sim, "MD - Basics");
+	return glutStuff(step, draw, reshape, keyboard, &argc, argv, sim, "MD - Basics");
 }
 

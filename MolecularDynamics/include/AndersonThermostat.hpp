@@ -3,33 +3,29 @@
 
 #include "ThermostatFactory.hpp"
 
-template<int D>
-class AndersonThermostat : public Thermostat<D> {
+class AndersonThermostat : public Thermostat {
 
 public:
-	AndersonThermostat(MDSimulation<D>* sim, double temp, double nu);
+	AndersonThermostat(MDSimulation* sim, double temp, double nu);
 
 	void setT(const double temp) override ;
 	double getT() const override;
 	void setNu(const double nu) override;
 	double getNu() const override;
-  void execute();
+  void execute() override;
 	~AndersonThermostat() = default;
 
 private:
-	MDSimulation<D>* sim;
+	MDSimulation* sim;
 	double temp;
 	double nu;
 	double p;
 };
 
-template<int D>
-class AndersonThermostatFactory : public ThermostatFactory<D> {
+class AndersonThermostatFactory : public ThermostatFactory {
 	
 	public:
-		Thermostat<D>* createAndersonThermostat(MDSimulation<D>* sim_, double temp_, double nu_) override {
-			return new AndersonThermostat<D>(sim_, temp_, nu_);
-		}
+		Thermostat* createAndersonThermostat(MDSimulation* sim_, double temp_, double nu_) override;
 };
 
 #endif

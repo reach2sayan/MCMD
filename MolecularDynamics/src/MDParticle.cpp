@@ -1,19 +1,16 @@
 #include "MDParticle.hpp"
 
-template<int D>
-MDParticle<D>::MDParticle() : 
-	dim{D},
-	r{Vector::Zero(D)},
-	v{Vector::Zero(D)},
-	a{Vector::Zero(D)},
-	verletList(std::make_unique<MDParticleList<D>>())
+MDParticle::MDParticle(const int dim_) : 
+	dim(dim_),
+	r(Vector::Zero(dim_)),
+	v(Vector::Zero(dim_)),
+	a(Vector::Zero(dim_)),
+	verletList(std::make_unique<MDParticleList>())
 {}
 
-template<int D>
-MDParticle<D>::MDParticle(const Vector& r_, const Vector& v_) :
+MDParticle::MDParticle(const Vector& r_, const Vector& v_) :
 	dim(r_.size()),
 	r(r_),
 	v(v_),
-	verletList(std::make_unique<MDParticleList<D>>())
+	verletList(std::make_unique<MDParticleList>())
 {}
-template class MDParticle<2>;

@@ -1,13 +1,11 @@
 #include "CalculatorFactory.hpp"
 
-template<int D>
-class LJCalculator : public Calculator<D> {
+class LJCalculator : public Calculator {
 
-	private:
 	public:
 
-		typename MDParticle<D>::Vector ForceFunc(const typename MDParticle<D>::Vector& r);
-		double PotentialFunc(const typename MDParticle<D>::Vector& r);
+		Vector ForceFunc(const Vector& r);
+		double PotentialFunc(const Vector& r);
 
-		static Calculator<D>* Create() { return new LJCalculator<D>(); }
+		static Calculator* Create() { return new LJCalculator(); }
 };

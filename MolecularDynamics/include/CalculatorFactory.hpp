@@ -6,17 +6,15 @@
 
 enum CalculatorType {LJ};
 
-template<int D>
 class Calculator {
 	public:
-		virtual typename MDParticle<D>::Vector ForceFunc(const typename MDParticle<D>::Vector& r) = 0;
-		virtual double PotentialFunc(const typename MDParticle<D>::Vector& r) = 0;
+		using Vector = typename MDParticle::Vector;
+		virtual Vector ForceFunc(const Vector& r) = 0;
+		virtual double PotentialFunc(const Vector& r) = 0;
 };
 
-template<int D>
-using CreateCalculatorFunc = Calculator<D>*(*)(void);
+using CreateCalculatorFunc = Calculator*(*)(void);
 
-template<int D>
 class CalculatorFactory {
 
 	private:
@@ -24,7 +22,7 @@ class CalculatorFactory {
 		CalculatorFactory(const CalculatorFactory&) = delete;
 		CalculatorFactory& operator=(const CalculatorFactory&) = delete;
 
-		using FactoryMap = std::unordered_map<CalculatorType,CreateCalculatorFunc<D>>;
+		using FactoryMap = std::unordered_map<CalculatorType,CreateCalculatorFunc>;
 		FactoryMap m_FactoryMap;
 
 	public:
@@ -35,8 +33,8 @@ class CalculatorFactory {
 			return &instance;
 		}
 
-		void Register(const CalculatorType ctype, CreateCalculatorFunc<D> pfnCreate);
-		Calculator<D>* CreateCalculator(const CalculatorType ctype);
+		void Register(const CalculatorType ctype, CreateCalculatorFunc pfnCreate);
+		Calculator* CreateCalculator(const CalculatorType ctype);
 };
 
 #endif

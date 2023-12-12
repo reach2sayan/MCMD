@@ -4,8 +4,7 @@
 
 using namespace MDConstants;
 
-template<int D>
-void AndersonThermostat<D>::execute(){
+void AndersonThermostat::execute(){
 
 	if (this->sim->pause)
 		return;
@@ -35,30 +34,28 @@ void AndersonThermostat<D>::execute(){
 	}
 }
 
-template<int D>
-inline AndersonThermostat<D>::AndersonThermostat(MDSimulation<D>* sim_, double temp_, double nu_) :
+inline AndersonThermostat::AndersonThermostat(MDSimulation* sim_, double temp_, double nu_) :
 	sim(sim_),temp(temp_), nu(-1.0*nu_) {
 		p = 1 - exp(-1*nu_*sim_->getDt());
 	}
 
-template<int D>
-inline void AndersonThermostat<D>::setNu(const double nu_){
+inline void AndersonThermostat::setNu(const double nu_){
 	nu = (-1.0)*nu_;
 	p = 1 - exp(-1*nu_*(this->sim->getDt()));
 }
 
-template<int D>
-inline double AndersonThermostat<D>::getNu() const {
+inline double AndersonThermostat::getNu() const {
 	return (-1.0)*nu;
 }
 
-template<int D>
-inline void AndersonThermostat<D>::setT(const double temp_) { 
+inline void AndersonThermostat::setT(const double temp_) { 
 	this->temp = -2.0*temp_;
 }
 
-template<int D>
-inline double AndersonThermostat<D>::getT() const {
+inline double AndersonThermostat::getT() const {
 	return -0.5*this->temp;
 }
-template class AndersonThermostat<2>;
+
+inline Thermostat* AndersonThermostatFactory::createAndersonThermostat(MDSimulation* sim_, double temp_, double nu_) {
+	return new AndersonThermostat(sim_, temp_, nu_);
+}

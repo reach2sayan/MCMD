@@ -29,7 +29,7 @@ add_executable(md
 	${PROJECT_SOURCE_DIR}/src/LJCalculator.cpp
 	${PROJECT_SOURCE_DIR}/src/MDParticle.cpp
 	${PROJECT_SOURCE_DIR}/src/MDSimulation.cpp
-	${PROJECT_SOURCE_DIR}/src/glutSetup2d-impl.cpp
+	${PROJECT_SOURCE_DIR}/src/glutSetup2d.cpp
 	${PROJECT_SOURCE_DIR}/src/utility.cpp
 	${PROJECT_SOURCE_DIR}/src/main.cpp)
 
