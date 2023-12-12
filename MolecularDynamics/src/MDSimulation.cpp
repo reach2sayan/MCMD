@@ -1,7 +1,9 @@
 #include "MDSimulation.hpp"
-#define ZERO_T 0
-using namespace MDConstants;
+#include "Logger.hpp"
 
+#define ZERO_T 0
+
+using namespace MDConstants;
 MDSimulation* MDSimulation::instance = nullptr;
 
 MDSimulation* MDSimulation::GetSimulationInstance(int dim, double dt, CalculatorType ctype, ThermostatType ttype, double r_inter, double r_verlet, int verletUpdate){
@@ -260,4 +262,9 @@ double MDSimulation::velocityVerletForce(){
 		}
 	}
 	return pot_;
+}
+
+void MDSimulation::log() const {
+	for(auto logger : loggers)
+		logger->log();
 }

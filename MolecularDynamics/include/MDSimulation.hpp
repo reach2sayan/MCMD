@@ -6,6 +6,7 @@
 #include "AndersonThermostat.hpp"
 #include "ThermostatFactory.hpp"
 #include "utility.hpp"
+#include <list>
 
 using namespace MDConstants;
 typedef struct graphData_t{
@@ -13,6 +14,7 @@ typedef struct graphData_t{
 	graphData_t* next;
 } graphData_t;
 
+class Logger;
 class MDSimulation{
 
 	public:
@@ -55,6 +57,11 @@ class MDSimulation{
 		bool pause;
 		graphData_t *graphDataFirst, *graphDataLast; // graphDataFirst contains max values and leads to values for t=0
 
+		void registerLogger(Logger* logger) { loggers.push_back(logger); }
+		void unregisterLogger(Logger* logger) { loggers.remove(logger); }
+
+		void log() const;
+
 	private:
 		double refreshVerletLists(bool, bool);
 		double velocityVerletForce();
@@ -68,6 +75,8 @@ class MDSimulation{
 		MatrixHistogram directional;
 		int verletSteps, verletUpdate, dim, histogramResolution;
 		bool periodic;
+
+		std::list<Logger*> loggers;
 };
 
 #endif

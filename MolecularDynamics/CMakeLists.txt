@@ -31,6 +31,7 @@ add_executable(md
 	${PROJECT_SOURCE_DIR}/src/MDSimulation.cpp
 	${PROJECT_SOURCE_DIR}/src/glutSetup2d.cpp
 	${PROJECT_SOURCE_DIR}/src/utility.cpp
+	${PROJECT_SOURCE_DIR}/src/StructureLogger.cpp
 	${PROJECT_SOURCE_DIR}/src/main.cpp)
 
 #target_compile_options(md PUBLIC -DNDEBUG)
