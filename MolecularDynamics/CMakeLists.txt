@@ -17,6 +17,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-O0 -Wall -Wpedantic -Wextra")
 SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
 
+find_package(OpenMP)
 find_package(OpenGL REQUIRED)
 find_package(Eigen3 REQUIRED)
 set(GLUT_INCLUDE_PATH "/usr/include/GL/" )
@@ -32,6 +33,7 @@ add_executable(md
 	${PROJECT_SOURCE_DIR}/src/glutSetup2d.cpp
 	${PROJECT_SOURCE_DIR}/src/utility.cpp
 	${PROJECT_SOURCE_DIR}/src/StructureLogger.cpp
+	${PROJECT_SOURCE_DIR}/src/ThermoLogger.cpp
 	${PROJECT_SOURCE_DIR}/src/main.cpp)
 
 #target_compile_options(md PUBLIC -DNDEBUG)

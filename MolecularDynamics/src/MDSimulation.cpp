@@ -38,7 +38,7 @@ MDSimulation::MDSimulation(int dim_, double dt_, CalculatorType ctype, Thermosta
 		}
 	}
 
-void MDSimulation::initSimulation(bool periodic_, const Vector simBox_, InitPositionFunc r0_, InitVelocityFunc v0_, int histogramResolution_, double histogramLength_){
+void MDSimulation::initSimulation(const bool periodic_, const Vector simBox_, InitPositionFunc r0_, InitVelocityFunc v0_, int histogramResolution_, double histogramLength_){
 
 	histogramResolution = histogramResolution_ == 0 ? histogramResolution_ : HISTOGRAM_RESOLUTION;
 	histogramLength = histogramLength_;
@@ -267,4 +267,24 @@ double MDSimulation::velocityVerletForce(){
 void MDSimulation::log() const {
 	for(auto logger : loggers)
 		logger->log();
+}
+
+bool MDSimulation::runSimulation(double runtime) {
+
+	double t = 0;
+	double sinceLastt = 0;
+	while(t < runtime){
+		getThermostat()->execute();
+		velocityVerletStep(true);
+		t += dt;
+		sinceLastt++;
+		if(sinceLastt == 100){
+			log();
+			sinceLastt = 0;
+		}
+	}
+	if (t == runtime)
+		return 1;
+	else
+		return 0;
 }

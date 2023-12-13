@@ -35,7 +35,8 @@ class MDSimulation{
     MDSimulation& operator=(const MDSimulation&) = delete;
 
 		static MDSimulation* GetSimulationInstance(int dim = 2, double dt = DEFAULT_TIMESTEP, CalculatorType ctype = CalculatorType::LJ, ThermostatType ttype = ThermostatType::ANDERSON, double r_inter = DEFAULT_R_INTER, double r_verlet = DEFAULT_R_VERLET, int verletUpdate = DEFAULT_VERLET_UPDATE);
-		void initSimulation(bool periodic_, const Vector simBox_ , InitPositionFunc r0_, InitVelocityFunc v0_, int histogramResolution_ , double histogramLength_ = 0.5);
+		void initSimulation(const bool periodic_, const Vector simBox_ , InitPositionFunc r0_, InitVelocityFunc v0_, int histogramResolution_ , double histogramLength_ = 0.5);
+		bool runSimulation(const double runtime);
 		void velocityVerletStep(bool);
 		void updateGraphs();
 		void resetGraphs();
@@ -43,6 +44,7 @@ class MDSimulation{
 		void resetRadialDistribution() { radial *= 0.0; }
 		VectorHistogram getRadialDistribution() const {return radial.normalized(); }
 		int getHistogramResolution() const { return histogramResolution; }
+		const Vector& GetSimulationBox() const { return simBox; }
 
 		void resetDirectionalDistribution() { directional = MatrixHistogram::Zero(histogramResolution,histogramResolution); }
 		MatrixHistogram getDirectionalDistribution() const;
@@ -51,7 +53,9 @@ class MDSimulation{
 		double getT() const { return t; }
 		int getDim() const { return dim; }
 		double getEPotMin() const { return ePotMin; }
-		Thermostat* getThermostat() { return thermo; }
+		Thermostat* getThermostat() const { return thermo; }
+		double getEPot() const { return ePot; }
+		double getEKin() const { return eKin; }
 
 		std::unique_ptr<MDParticleList> particles;
 		bool pause;

@@ -1,11 +1,15 @@
 #include "CalculatorFactory.hpp"
+#include "Logger.hpp"
 #include "MDSimulation.hpp"
 #include "ThermostatFactory.hpp"
 #include "AndersonThermostat.hpp"
 #include "glutSetup2d.hpp"
+#include <eigen3/Eigen/Core>
 
 using namespace MDConstants;
 int main(int argc, char* argv[]){	// Args: n, dt, nue, temp_start [, glut-Optionen]
+
+	Eigen::initParallel();
 	
 	int n;
 	double dt;
@@ -26,8 +30,11 @@ int main(int argc, char* argv[]){	// Args: n, dt, nue, temp_start [, glut-Option
 	}
 	else
 		return 1;
+	Eigen::setNbThreads(4);
 
 	MDSimulation* sim = MDSimulation::GetSimulationInstance(DIMENSION, dt);
+	StructureLogger logger(sim, "./output.txt"); 
+	ThermoLogger tlogger(sim, "./outputoutput.txt"); 
 	for (int i = 0; i < n; i++){
 		MDParticle* particle = new MDParticle(DIMENSION);
 		sim->particles->push_back(particle);
@@ -35,7 +42,10 @@ int main(int argc, char* argv[]){	// Args: n, dt, nue, temp_start [, glut-Option
 	sim->getThermostat()->setT(temp_start);
 	sim->getThermostat()->setNu(nu);
 	sim->initSimulation(true, MDParticle::Vector::Ones(DIMENSION), nullptr, nullptr, 400, 0.15);
+	
+	sim->runSimulation(50);
 
-	return glutStuff(step, draw, reshape, keyboard, &argc, argv, sim, "MD - Basics");
+	return 0;
+	//return glutStuff(step, draw, reshape, keyboard, &argc, argv, sim, "MD - Basics");
 }
 
